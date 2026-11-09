@@ -27,10 +27,11 @@ class RiwayatController extends Controller
             $output = fopen('php://output', 'w');
             // BOM agar karakter UTF-8 terbaca dengan baik oleh Excel.
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, ['Tanggal', 'Jenis', 'Kode Barang', 'Nama Barang', 'Jumlah', 'Supplier', 'Petugas', 'Keterangan']);
+            fputcsv($output, ['No. Transaksi', 'Tanggal', 'Jenis', 'Kode Barang', 'Nama Barang', 'Jumlah', 'Supplier', 'Petugas', 'Keterangan']);
 
             foreach ($movements as $movement) {
                 fputcsv($output, [
+                    $movement->transactionCode,
                     $movement->date->format('Y-m-d'),
                     $movement->type,
                     $movement->code,
@@ -74,6 +75,7 @@ class RiwayatController extends Controller
             ? collect()
             : $masukQuery->get()->map(fn ($row) => (object) [
                 'id' => $row->id,
+                'transactionCode' => $row->transaction_code ?? '—',
                 'type' => 'Barang Masuk',
                 'date' => $row->date,
                 'code' => $row->barang?->code ?? '-',
@@ -88,6 +90,7 @@ class RiwayatController extends Controller
             ? collect()
             : $keluarQuery->get()->map(fn ($row) => (object) [
                 'id' => $row->id,
+                'transactionCode' => $row->transaction_code ?? '—',
                 'type' => 'Barang Keluar',
                 'date' => $row->date,
                 'code' => $row->barang?->code ?? '-',

@@ -27,10 +27,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Barang::firstOrCreate(['code' => 'BRG-EL-001'], [
-            'name' => 'Mouse Wireless', 'category_id' => $elektronik->id, 'location' => 'Rak A1', 'unit' => 'pcs', 'stock' => 20, 'minimum_stock' => 5,
+            'name' => 'Mouse Wireless', 'category_id' => $elektronik->id, 'location' => 'Rak A1', 'unit' => 'pcs', 'stock' => 20, 'minimum_stock' => 5, 'target_stock' => 15,
         ]);
         Barang::firstOrCreate(['code' => 'BRG-ATK-001'], [
-            'name' => 'Kertas A4', 'category_id' => $atk->id, 'location' => 'Rak B1', 'unit' => 'rim', 'stock' => 4, 'minimum_stock' => 5,
+            'name' => 'Kertas A4', 'category_id' => $atk->id, 'location' => 'Rak B1', 'unit' => 'rim', 'stock' => 4, 'minimum_stock' => 5, 'target_stock' => 10,
         ]);
     }
 }

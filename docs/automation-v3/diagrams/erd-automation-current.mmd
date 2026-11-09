@@ -1,0 +1,58 @@
+erDiagram
+    USERS ||--o{ STOCK_INS : records
+    USERS ||--o{ STOCK_OUTS : records
+    CATEGORIES ||--o{ ITEMS : groups
+    ITEMS ||--o{ STOCK_INS : receives
+    ITEMS ||--o{ STOCK_OUTS : issues
+    SUPPLIERS ||--o{ STOCK_INS : supplies
+
+    USERS {
+      bigint id PK
+      string name
+      string email UK
+      string password
+      string role
+    }
+    CATEGORIES {
+      bigint id PK
+      string name UK
+      text description
+    }
+    SUPPLIERS {
+      bigint id PK
+      string name
+      string contact_person
+      string phone
+      string email
+      text address
+    }
+    ITEMS {
+      bigint id PK
+      string code UK "auto generated"
+      string name
+      bigint category_id FK
+      string location
+      string unit
+      int stock
+      int minimum_stock
+      int target_stock
+    }
+    STOCK_INS {
+      bigint id PK
+      string transaction_code UK "auto generated"
+      bigint item_id FK
+      bigint supplier_id FK
+      bigint user_id FK
+      date date
+      int quantity
+      text note
+    }
+    STOCK_OUTS {
+      bigint id PK
+      string transaction_code UK "auto generated"
+      bigint item_id FK
+      bigint user_id FK
+      date date
+      int quantity
+      text note
+    }

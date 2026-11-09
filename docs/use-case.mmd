@@ -1,11 +1,51 @@
 flowchart LR
-    Admin[Admin] --- UC1((Kelola barang))
-    Admin --- UC2((Kelola kategori))
-    Admin --- UC3((Kelola supplier))
-    Admin --- UC4((Lihat laporan dan riwayat))
-    Admin --- UC5((Catat barang masuk))
-    Admin --- UC6((Catat barang keluar))
-    Admin --- UC7((Monitoring stok))
-    Petugas[Petugas Gudang] --- UC5
-    Petugas --- UC6
-    Petugas --- UC7
+    %% Diagram use case berdasarkan routes/web.php dan pembatasan adminOnly() pada controller.
+    Admin["👤 Admin"]
+    Petugas["👤 Petugas Gudang"]
+
+    subgraph Sistem["Sistem Informasi Inventaris & Pengelolaan Barang"]
+        direction TB
+        UCLogin((Login))
+        UCLogout((Logout))
+        UCDashboard((Lihat dashboard))
+        UCViewMaster((Lihat data barang, kategori, dan supplier))
+        UCManageCategory((Kelola kategori: tambah, ubah, hapus))
+        UCManageSupplier((Kelola supplier: tambah, ubah, hapus))
+        UCManageItem((Kelola barang: tambah, ubah, hapus))
+        UCStockIn((Catat barang masuk))
+        UCStockOut((Catat barang keluar))
+        UCMonitor((Monitor stok minimum melalui dashboard))
+        UCHistory((Lihat riwayat transaksi))
+        UCFilter((Filter riwayat tanggal dan jenis))
+        UCExport((Ekspor laporan CSV))
+    end
+
+    Admin --> UCLogin
+    Admin --> UCLogout
+    Admin --> UCDashboard
+    Admin --> UCViewMaster
+    Admin --> UCManageCategory
+    Admin --> UCManageSupplier
+    Admin --> UCManageItem
+    Admin --> UCStockIn
+    Admin --> UCStockOut
+    Admin --> UCMonitor
+    Admin --> UCHistory
+    Admin --> UCFilter
+    Admin --> UCExport
+
+    Petugas --> UCLogin
+    Petugas --> UCLogout
+    Petugas --> UCDashboard
+    Petugas --> UCViewMaster
+    Petugas --> UCStockIn
+    Petugas --> UCStockOut
+    Petugas --> UCMonitor
+    Petugas --> UCHistory
+    Petugas --> UCFilter
+    Petugas --> UCExport
+
+    classDef actor fill:#fff,stroke:#334155,stroke-width:1.5px,color:#0f172a;
+    classDef usecase fill:#eff6ff,stroke:#2563eb,stroke-width:1px,color:#1e3a8a;
+    class Admin,Petugas actor;
+    class UCLogin,UCLogout,UCDashboard,UCViewMaster,UCManageCategory,UCManageSupplier,UCManageItem,UCStockIn,UCStockOut,UCMonitor,UCHistory,UCFilter,UCExport usecase;

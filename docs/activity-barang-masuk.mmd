@@ -1,12 +1,19 @@
 flowchart TD
-    A([Mulai]) --> B[Pilih supplier dan barang]
-    B --> C[Masukkan jumlah dan tanggal]
-    C --> D{Input valid?}
-    D -- Tidak --> C
-    D -- Ya --> E[Mulai database transaction]
-    E --> F[Kunci dan ambil data barang]
-    F --> G[Tambah stok barang]
-    G --> H[Simpan riwayat barang masuk]
-    H --> I[Commit database transaction]
-    I --> J[Tampilkan notifikasi berhasil]
-    J --> K([Selesai])
+    A([Mulai]) --> B[Petugas/Admin membuka form barang masuk]
+    B --> C[Pilih barang dan supplier]
+    C --> D[Isi jumlah, tanggal, dan catatan]
+    D --> E{Validasi form berhasil?}
+    E -- Tidak --> F[Tampilkan pesan validasi]
+    F --> C
+    E -- Ya --> G[Mulai DB transaction]
+    G --> H[Ambil data barang dengan lockForUpdate]
+    H --> I[Tambah stok barang sesuai jumlah]
+    I --> J[Simpan record stock_ins]
+    J --> K{Seluruh proses berhasil?}
+    K -- Tidak --> L[Rollback otomatis oleh DB transaction]
+    L --> M[Tampilkan pesan kegagalan]
+    K -- Ya --> N[Commit DB transaction]
+    N --> O[Tampilkan notifikasi berhasil]
+    M --> P([Selesai])
+    O --> P
+

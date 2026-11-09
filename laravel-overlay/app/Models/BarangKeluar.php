@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class BarangKeluar extends Model
 {
     protected $table = 'stock_outs';
-    protected $fillable = ['item_id', 'user_id', 'date', 'quantity', 'note'];
+    protected $fillable = ['transaction_code', 'item_id', 'user_id', 'date', 'quantity', 'note'];
 
     protected function casts(): array
     {

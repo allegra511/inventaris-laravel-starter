@@ -60,6 +60,55 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('riwayat.index'));
         $this->assertDatabaseHas('items', ['id' => $barang->id, 'stock' => 7]);
         $this->assertDatabaseHas('stock_outs', ['item_id' => $barang->id, 'quantity' => 3]);
+        $transaksi = \App\Models\BarangKeluar::latest('id')->firstOrFail();
+        $this->assertStringStartsWith('OUT-' . now()->format('Ymd') . '-', $transaksi->transaction_code);
+    }
+
+    public function test_kode_barang_dibuat_otomatis_dan_stok_awal_nol(): void
+    {
+        [$user] = $this->buatDataDasar();
+        $kategori = Kategori::first();
+
+        $response = $this->actingAs($user)->post(route('barang.store'), [
+            'name' => 'Keyboard Mechanical',
+            'category_id' => $kategori->id,
+            'location' => 'Rak C1',
+            'unit' => 'pcs',
+            'minimum_stock' => 3,
+            'target_stock' => 12,
+        ]);
+
+        $response->assertRedirect(route('barang.index'));
+        $barang = Barang::where('name', 'Keyboard Mechanical')->firstOrFail();
+        $this->assertStringStartsWith('BRG-' . now()->format('Ymd') . '-', $barang->code);
+        $this->assertSame(0, $barang->stock);
+        $this->assertSame(12, $barang->target_stock);
+    }
+
+    public function test_barang_masuk_membuat_nomor_transaksi_otomatis_dan_tanggal_default(): void
+    {
+        [$user, $barang, $supplier] = $this->buatDataDasar();
+
+        $response = $this->actingAs($user)->post(route('transaksi.masuk.store'), [
+            'item_id' => $barang->id,
+            'supplier_id' => $supplier->id,
+            'quantity' => 2,
+            'note' => 'Penerimaan tanpa input tanggal',
+        ]);
+
+        $response->assertRedirect(route('riwayat.index'));
+        $transaksi = \App\Models\BarangMasuk::latest('id')->firstOrFail();
+        $this->assertSame(now()->toDateString(), $transaksi->date->format('Y-m-d'));
+        $this->assertStringStartsWith('IN-' . now()->format('Ymd') . '-', $transaksi->transaction_code);
+        $this->assertSame($user->id, $transaksi->user_id);
+    }
+
+    public function test_saran_restock_dihitung_otomatis_dari_target_stock(): void
+    {
+        [$user, $barang] = $this->buatDataDasar();
+        $barang->update(['stock' => 4, 'minimum_stock' => 5, 'target_stock' => 15]);
+
+        $this->assertSame(11, $barang->fresh()->jumlahRestockDisarankan());
     }
 
     private function buatDataDasar(): array

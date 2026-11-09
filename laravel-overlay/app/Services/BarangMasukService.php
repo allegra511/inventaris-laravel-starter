@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\BarangMasuk;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class BarangMasukService extends Transaksi
 {
@@ -26,7 +27,7 @@ class BarangMasukService extends Transaksi
             $barang = Barang::query()->lockForUpdate()->findOrFail($this->itemId);
             $barang->tambahStok($this->quantity);
 
-            return BarangMasuk::create([
+            $transaksi = BarangMasuk::create([
                 'item_id' => $barang->id,
                 'supplier_id' => $this->supplierId,
                 'user_id' => $this->userId,
@@ -34,6 +35,12 @@ class BarangMasukService extends Transaksi
                 'quantity' => $this->quantity,
                 'note' => $this->note,
             ]);
+
+            $transaksi->forceFill([
+                'transaction_code' => 'IN-' . Carbon::parse($this->date)->format('Ymd') . '-' . str_pad((string) $transaksi->id, 6, '0', STR_PAD_LEFT),
+            ])->save();
+
+            return $transaksi;
         });
     }
 }

@@ -1,61 +1,114 @@
 classDiagram
+    direction LR
+
     class User {
-      +int id
-      +String name
-      +String email
-      +String role
-      +isAdmin() bool
+        <<Eloquent Model>>
+        +id: int
+        +name: string
+        +email: string
+        +password: string
+        +role: string
+        +isAdmin() bool
+        +barangMasuk() HasMany
+        +barangKeluar() HasMany
     }
+
     class Kategori {
-      +int id
-      +String name
-      +String description
+        <<Eloquent Model>>
+        +id: int
+        +name: string
+        +description: string
+        +barang() HasMany
     }
+
     class Supplier {
-      +int id
-      +String name
-      +String phone
-      +String email
+        <<Eloquent Model>>
+        +id: int
+        +name: string
+        +contact_person: string
+        +phone: string
+        +email: string
+        +address: string
+        +barangMasuk() HasMany
     }
+
     class Barang {
-      +int id
-      +String code
-      +String name
-      +int stock
-      +int minimumStock
-      +tambahStok(jumlah) void
-      +kurangiStok(jumlah) bool
-      +isStokMinimum() bool
+        <<Eloquent Model>>
+        +id: int
+        +code: string
+        +name: string
+        +category_id: int
+        +location: string
+        +unit: string
+        +stock: int
+        +minimum_stock: int
+        +kategori() BelongsTo
+        +barangMasuk() HasMany
+        +barangKeluar() HasMany
+        +tambahStok(jumlah: int) void
+        +kurangiStok(jumlah: int) bool
+        +isStokMinimum() bool
     }
-    class Transaksi {
-      <<abstract>>
-      #int itemId
-      #int quantity
-      #Date date
-      #int userId
-      +prosesTransaksi()*
-    }
-    class BarangMasukService {
-      +int supplierId
-      +prosesTransaksi() Model
-    }
-    class BarangKeluarService {
-      +prosesTransaksi() Model
-    }
+
     class BarangMasuk {
-      +int itemId
-      +int supplierId
-      +int userId
-      +int quantity
+        <<Eloquent Model>>
+        +id: int
+        +item_id: int
+        +supplier_id: int
+        +user_id: int|null
+        +date: date
+        +quantity: int
+        +note: string|null
+        +barang() BelongsTo
+        +supplier() BelongsTo
+        +user() BelongsTo
     }
+
     class BarangKeluar {
-      +int itemId
-      +int userId
-      +int quantity
+        <<Eloquent Model>>
+        +id: int
+        +item_id: int
+        +user_id: int|null
+        +date: date
+        +quantity: int
+        +note: string
+        +barang() BelongsTo
+        +user() BelongsTo
     }
-    Kategori "1" --> "many" Barang : mengelompokkan
-    Barang "1" --> "many" BarangMasuk : memiliki riwayat
-    Barang "1" --> "many" BarangKeluar : memiliki riwayat
-    Supplier "1" --> "many" BarangMasuk : memasok
-    Transaksi <|-- BarangMasukService
-    Transaksi <|-- BarangKeluarService
+
+    class Transaksi {
+        <<abstract service>>
+        #itemId: int
+        #quantity: int
+        #date: string
+        #userId: int
+        #note: string|null
+        +__construct(itemId, quantity, date, userId, note)
+        +prosesTransaksi() Model
+    }
+
+    class BarangMasukService {
+        <<service>>
+        -supplierId: int
+        +__construct(itemId, quantity, date, userId, supplierId, note)
+        +prosesTransaksi() Model
+    }
+
+    class BarangKeluarService {
+        <<service>>
+        +prosesTransaksi() Model
+    }
+
+    Kategori "1" --> "0..*" Barang : mengelompokkan
+    Barang "1" --> "0..*" BarangMasuk : memiliki transaksi
+    Barang "1" --> "0..*" BarangKeluar : memiliki transaksi
+    Supplier "1" --> "0..*" BarangMasuk : memasok
+    User "0..1" --> "0..*" BarangMasuk : dicatat oleh
+    User "0..1" --> "0..*" BarangKeluar : dicatat oleh
+
+    Transaksi <|-- BarangMasukService : inheritance
+    Transaksi <|-- BarangKeluarService : inheritance
+    BarangMasukService ..> Barang : lock dan tambah stok
+    BarangMasukService ..> BarangMasuk : membuat record
+    BarangKeluarService ..> Barang : lock dan kurangi stok
+    BarangKeluarService ..> BarangKeluar : membuat record

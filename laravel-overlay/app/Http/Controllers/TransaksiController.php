@@ -10,12 +10,19 @@ use Illuminate\Http\Request;
 
 class TransaksiController extends Controller
 {
-    public function formMasuk()
+    public function formMasuk(Request $request)
     {
+        $barangTerpilih = Barang::find($request->integer('item_id'));
+        $jumlahDefault = $request->filled('quantity')
+            ? max(1, $request->integer('quantity'))
+            : max(1, $barangTerpilih?->jumlahRestockDisarankan() ?? 1);
+
         return view('transactions.form', [
             'type' => 'masuk',
             'barangs' => Barang::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
+            'defaultItemId' => $barangTerpilih?->id,
+            'defaultQuantity' => $jumlahDefault,
         ]);
     }
 
@@ -25,16 +32,20 @@ class TransaksiController extends Controller
             'item_id' => ['required', 'exists:items,id'],
             'supplier_id' => ['required', 'exists:suppliers,id'],
             'quantity' => ['required', 'integer', 'min:1'],
-            'date' => ['required', 'date'],
+            'date' => ['nullable', 'date'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
 
         (new BarangMasukService(
-            (int) $data['item_id'], (int) $data['quantity'], $data['date'],
-            (int) $request->user()->id, (int) $data['supplier_id'], $data['note'] ?? null
+            (int) $data['item_id'],
+            (int) $data['quantity'],
+            $data['date'] ?? now()->toDateString(),
+            (int) $request->user()->id,
+            (int) $data['supplier_id'],
+            $data['note'] ?? null,
         ))->prosesTransaksi();
 
-        return redirect()->route('riwayat.index')->with('success', 'Transaksi barang masuk berhasil. Stok telah ditambahkan.');
+        return redirect()->route('riwayat.index')->with('success', 'Transaksi barang masuk berhasil. Nomor transaksi dan stok telah diperbarui otomatis.');
     }
 
     public function formKeluar()
@@ -43,6 +54,8 @@ class TransaksiController extends Controller
             'type' => 'keluar',
             'barangs' => Barang::orderBy('name')->get(),
             'suppliers' => collect(),
+            'defaultItemId' => null,
+            'defaultQuantity' => 1,
         ]);
     }
 
@@ -51,15 +64,18 @@ class TransaksiController extends Controller
         $data = $request->validate([
             'item_id' => ['required', 'exists:items,id'],
             'quantity' => ['required', 'integer', 'min:1'],
-            'date' => ['required', 'date'],
+            'date' => ['nullable', 'date'],
             'note' => ['required', 'string', 'max:1000'],
         ]);
 
         (new BarangKeluarService(
-            (int) $data['item_id'], (int) $data['quantity'], $data['date'],
-            (int) $request->user()->id, $data['note']
+            (int) $data['item_id'],
+            (int) $data['quantity'],
+            $data['date'] ?? now()->toDateString(),
+            (int) $request->user()->id,
+            $data['note'],
         ))->prosesTransaksi();
 
-        return redirect()->route('riwayat.index')->with('success', 'Transaksi barang keluar berhasil. Stok telah dikurangi.');
+        return redirect()->route('riwayat.index')->with('success', 'Transaksi barang keluar berhasil. Nomor transaksi dan stok telah diperbarui otomatis.');
     }
 }

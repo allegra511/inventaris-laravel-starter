@@ -1,0 +1,58 @@
+classDiagram
+    class BarangController {
+      +store(Request)
+      +update(Request, Barang)
+    }
+    class TransaksiController {
+      +formMasuk(Request)
+      +simpanMasuk(Request)
+      +formKeluar()
+      +simpanKeluar(Request)
+    }
+    class Barang {
+      +code
+      +stock
+      +minimum_stock
+      +target_stock
+      +tambahStok(jumlah)
+      +kurangiStok(jumlah)
+      +isStokMinimum()
+      +jumlahRestockDisarankan()
+    }
+    class Transaksi {
+      <<abstract>>
+      #itemId
+      #quantity
+      #date
+      #userId
+      +prosesTransaksi()*
+    }
+    class BarangMasukService {
+      +supplierId
+      +prosesTransaksi()
+    }
+    class BarangKeluarService {
+      +prosesTransaksi()
+    }
+    class BarangMasuk {
+      +transaction_code
+      +item_id
+      +supplier_id
+      +user_id
+      +date
+      +quantity
+    }
+    class BarangKeluar {
+      +transaction_code
+      +item_id
+      +user_id
+      +date
+      +quantity
+    }
+    Transaksi <|-- BarangMasukService
+    Transaksi <|-- BarangKeluarService
+    BarangController ..> Barang : generates code
+    TransaksiController ..> BarangMasukService : invokes
+    TransaksiController ..> BarangKeluarService : invokes
+    BarangMasukService ..> BarangMasuk : creates
+    BarangKeluarService ..> BarangKeluar : creates

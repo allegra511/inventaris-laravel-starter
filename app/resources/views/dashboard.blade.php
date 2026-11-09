@@ -9,16 +9,16 @@
     <div class="stat-card warning-stat"><span>Stok minimum</span><strong>{{ $stokKritis }}</strong><small>Perlu diperhatikan</small></div>
 </div>
 <div class="content-grid">
-    <section class="panel"><div class="panel-heading"><div><h2>Barang perlu restock</h2><p class="muted">Stok sama dengan atau di bawah batas minimum.</p></div><a href="{{ route('barang.index') }}" class="text-link">Lihat barang</a></div>
+    <section class="panel"><div class="panel-heading"><div><h2>Barang perlu restock</h2><p class="muted">Jumlah saran restock dihitung otomatis dari target stok ideal.</p></div><a href="{{ route('barang.index') }}" class="text-link">Lihat barang</a></div>
         @if($barangStokKritis->isEmpty())<p class="empty-state">Tidak ada barang dengan stok kritis.</p>@else
-        <div class="table-wrap"><table><thead><tr><th>Barang</th><th>Lokasi</th><th>Stok</th><th>Minimum</th></tr></thead><tbody>
-        @foreach($barangStokKritis as $barang)<tr><td><strong>{{ $barang->name }}</strong><small>{{ $barang->code }}</small></td><td>{{ $barang->location ?: '—' }}</td><td><span class="status status-danger">{{ $barang->stock }} {{ $barang->unit }}</span></td><td>{{ $barang->minimum_stock }}</td></tr>@endforeach
+        <div class="table-wrap"><table><thead><tr><th>Barang</th><th>Stok</th><th>Minimum</th><th>Target</th><th>Saran tambah</th><th>Aksi</th></tr></thead><tbody>
+        @foreach($barangStokKritis as $barang)<tr><td><strong>{{ $barang->name }}</strong><small>{{ $barang->code }} · {{ $barang->location ?: 'Lokasi belum diatur' }}</small></td><td><span class="status status-danger">{{ $barang->stock }} {{ $barang->unit }}</span></td><td>{{ $barang->minimum_stock }}</td><td>{{ $barang->target_stock }}</td><td><strong>{{ $barang->jumlahRestockDisarankan() }} {{ $barang->unit }}</strong></td><td>@if($barang->jumlahRestockDisarankan() > 0)<a class="text-link" href="{{ route('transaksi.masuk', ['item_id' => $barang->id, 'quantity' => $barang->jumlahRestockDisarankan()]) }}">Buat restock</a>@else<span class="muted">Atur target stok</span>@endif</td></tr>@endforeach
         </tbody></table></div>@endif
     </section>
     <section class="panel quick-actions"><h2>Aksi cepat</h2><p class="muted">Catat pergerakan barang.</p><a class="action-link" href="{{ route('transaksi.masuk') }}"><span class="action-icon plus">＋</span><span><strong>Barang masuk</strong><small>Tambah stok dari supplier</small></span></a><a class="action-link" href="{{ route('transaksi.keluar') }}"><span class="action-icon minus">−</span><span><strong>Barang keluar</strong><small>Catat pengeluaran barang</small></span></a><a class="action-link" href="{{ route('riwayat.index') }}"><span class="action-icon history">↺</span><span><strong>Riwayat transaksi</strong><small>Lihat pergerakan barang</small></span></a></section>
 </div>
 <section class="panel"><div class="panel-heading"><div><h2>Transaksi terbaru</h2><p class="muted">Lima transaksi masuk terakhir.</p></div><a href="{{ route('riwayat.index') }}" class="text-link">Semua riwayat</a></div>
 @if($barangMasukTerbaru->isEmpty())<p class="empty-state">Belum ada transaksi barang masuk.</p>@else
-<div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Barang</th><th>Supplier</th><th>Jumlah</th></tr></thead><tbody>@foreach($barangMasukTerbaru as $trx)<tr><td>{{ $trx->date->format('d-m-Y') }}</td><td>{{ $trx->barang?->name ?? 'Barang dihapus' }}</td><td>{{ $trx->supplier?->name ?? '—' }}</td><td><span class="status status-success">+{{ $trx->quantity }}</span></td></tr>@endforeach</tbody></table></div>@endif
+<div class="table-wrap"><table><thead><tr><th>Nomor transaksi</th><th>Tanggal</th><th>Barang</th><th>Supplier</th><th>Jumlah</th></tr></thead><tbody>@foreach($barangMasukTerbaru as $trx)<tr><td>{{ $trx->transaction_code ?: '—' }}</td><td>{{ $trx->date->format('d-m-Y') }}</td><td>{{ $trx->barang?->name ?? 'Barang dihapus' }}</td><td>{{ $trx->supplier?->name ?? '—' }}</td><td><span class="status status-success">+{{ $trx->quantity }}</span></td></tr>@endforeach</tbody></table></div>@endif
 </section>
 @endsection

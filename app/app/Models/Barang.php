@@ -9,11 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Barang extends Model
 {
     protected $table = 'items';
-    protected $fillable = ['code', 'name', 'category_id', 'location', 'unit', 'stock', 'minimum_stock'];
+    protected $fillable = ['code', 'name', 'category_id', 'location', 'unit', 'stock', 'minimum_stock', 'target_stock'];
 
     protected function casts(): array
     {
-        return ['stock' => 'integer', 'minimum_stock' => 'integer'];
+        return [
+            'stock' => 'integer',
+            'minimum_stock' => 'integer',
+            'target_stock' => 'integer',
+        ];
     }
 
     public function kategori(): BelongsTo
@@ -36,6 +40,7 @@ class Barang extends Model
         if ($jumlah < 1) {
             throw new \InvalidArgumentException('Jumlah penambahan harus lebih dari nol.');
         }
+
         $this->stock += $jumlah;
         $this->save();
     }
@@ -45,6 +50,7 @@ class Barang extends Model
         if ($jumlah < 1 || $this->stock < $jumlah) {
             return false;
         }
+
         $this->stock -= $jumlah;
         $this->save();
         return true;
@@ -53,5 +59,10 @@ class Barang extends Model
     public function isStokMinimum(): bool
     {
         return $this->stock <= $this->minimum_stock;
+    }
+
+    public function jumlahRestockDisarankan(): int
+    {
+        return max(0, $this->target_stock - $this->stock);
     }
 }

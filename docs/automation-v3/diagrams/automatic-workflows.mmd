@@ -1,0 +1,18 @@
+flowchart TD
+    A[Admin membuat data barang] --> B[Sistem membuat kode barang otomatis]
+    B --> C[Stok awal ditetapkan 0]
+    C --> D[Barang siap digunakan]
+    D --> E{Stok <= batas minimum?}
+    E -- Tidak --> F[Dashboard menampilkan stok normal]
+    E -- Ya --> G[Sistem menghitung target stok - stok saat ini]
+    G --> H[Dashboard menampilkan saran restock]
+    H --> I[Admin meninjau rekomendasi]
+    I --> J[Admin membuat / menyetujui PO]
+    J --> K[Petugas mengonfirmasi jumlah diterima]
+    K --> L[Sistem membuat transaksi masuk dan menaikkan stok]
+    D --> M[Petugas membuat transaksi keluar]
+    M --> N{Stok mencukupi?}
+    N -- Tidak --> O[Transaksi ditolak; stok tidak berubah]
+    N -- Ya --> P[Nomor transaksi dan petugas dibuat otomatis]
+    P --> Q[Stok dikurangi dan riwayat disimpan atomik]
+    Q --> E

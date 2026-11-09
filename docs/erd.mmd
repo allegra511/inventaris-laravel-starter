@@ -1,21 +1,31 @@
 erDiagram
     USERS ||--o{ STOCK_INS : mencatat
     USERS ||--o{ STOCK_OUTS : mencatat
-    CATEGORIES ||--o{ ITEMS : memiliki
-    ITEMS ||--o{ STOCK_INS : dicatat_pada
-    ITEMS ||--o{ STOCK_OUTS : dikeluarkan_pada
+    CATEGORIES ||--o{ ITEMS : mengelompokkan
+    ITEMS ||--o{ STOCK_INS : memiliki
+    ITEMS ||--o{ STOCK_OUTS : memiliki
     SUPPLIERS ||--o{ STOCK_INS : memasok
+
     USERS {
         bigint id PK
         string name
-        string email
+        string email UK
+        timestamp email_verified_at
+        string password
         string role
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
     }
+
     CATEGORIES {
         bigint id PK
-        string name
+        string name UK
         text description
+        timestamp created_at
+        timestamp updated_at
     }
+
     SUPPLIERS {
         bigint id PK
         string name
@@ -23,31 +33,42 @@ erDiagram
         string phone
         string email
         text address
+        timestamp created_at
+        timestamp updated_at
     }
+
     ITEMS {
         bigint id PK
-        string code
+        string code UK
         string name
         bigint category_id FK
         string location
         string unit
         int stock
         int minimum_stock
+        timestamp created_at
+        timestamp updated_at
     }
+
     STOCK_INS {
         bigint id PK
         bigint item_id FK
         bigint supplier_id FK
-        bigint user_id FK
+        bigint user_id FK "nullable, ON DELETE SET NULL"
         date date
         int quantity
-        text note
+        text note "nullable"
+        timestamp created_at
+        timestamp updated_at
     }
+
     STOCK_OUTS {
         bigint id PK
         bigint item_id FK
-        bigint user_id FK
+        bigint user_id FK "nullable, ON DELETE SET NULL"
         date date
         int quantity
         text note
+        timestamp created_at
+        timestamp updated_at
     }
