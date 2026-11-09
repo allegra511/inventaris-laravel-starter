@@ -1,0 +1,15 @@
+flowchart TD
+    A([Mulai]) --> B[Pilih barang]
+    B --> C[Masukkan jumlah, tanggal, dan keterangan]
+    C --> D{Input valid?}
+    D -- Tidak --> C
+    D -- Ya --> E[Mulai database transaction]
+    E --> F[Kunci dan ambil data stok]
+    F --> G{Stok mencukupi?}
+    G -- Tidak --> H[Rollback dan tampilkan peringatan]
+    H --> I([Selesai])
+    G -- Ya --> J[Kurangi stok]
+    J --> K[Simpan riwayat barang keluar]
+    K --> L[Commit database transaction]
+    L --> M[Tampilkan notifikasi berhasil]
+    M --> I

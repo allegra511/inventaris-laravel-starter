@@ -1,0 +1,75 @@
+services:
+  scaffold:
+    image: composer:2
+    profiles: ["setup"]
+    working_dir: /var/www/html
+    volumes:
+      - ./app:/var/www/html
+    command: ["create-project", "laravel/laravel", ".", "^13.0"]
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: inventaris_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./app:/var/www/html
+      - vendor_data:/var/www/html/vendor
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: inventaris_db
+      DB_USERNAME: inventaris_user
+      DB_PASSWORD: inventaris_password
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "test -f vendor/autoload.php && php artisan --version >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  db:
+    image: mysql:8.4
+    container_name: inventaris_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: inventaris_db
+      MYSQL_USER: inventaris_user
+      MYSQL_PASSWORD: inventaris_password
+      MYSQL_ROOT_PASSWORD: root_password_local
+    ports:
+      - "3308:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin:5.2-apache
+    container_name: inventaris_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  vendor_data:

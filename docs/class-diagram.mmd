@@ -1,0 +1,61 @@
+classDiagram
+    class User {
+      +int id
+      +String name
+      +String email
+      +String role
+      +isAdmin() bool
+    }
+    class Kategori {
+      +int id
+      +String name
+      +String description
+    }
+    class Supplier {
+      +int id
+      +String name
+      +String phone
+      +String email
+    }
+    class Barang {
+      +int id
+      +String code
+      +String name
+      +int stock
+      +int minimumStock
+      +tambahStok(jumlah) void
+      +kurangiStok(jumlah) bool
+      +isStokMinimum() bool
+    }
+    class Transaksi {
+      <<abstract>>
+      #int itemId
+      #int quantity
+      #Date date
+      #int userId
+      +prosesTransaksi()*
+    }
+    class BarangMasukService {
+      +int supplierId
+      +prosesTransaksi() Model
+    }
+    class BarangKeluarService {
+      +prosesTransaksi() Model
+    }
+    class BarangMasuk {
+      +int itemId
+      +int supplierId
+      +int userId
+      +int quantity
+    }
+    class BarangKeluar {
+      +int itemId
+      +int userId
+      +int quantity
+    }
+    Kategori "1" --> "many" Barang : mengelompokkan
+    Barang "1" --> "many" BarangMasuk : memiliki riwayat
+    Barang "1" --> "many" BarangKeluar : memiliki riwayat
+    Supplier "1" --> "many" BarangMasuk : memasok
+    Transaksi <|-- BarangMasukService
+    Transaksi <|-- BarangKeluarService

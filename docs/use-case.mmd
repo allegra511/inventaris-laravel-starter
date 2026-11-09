@@ -1,0 +1,11 @@
+flowchart LR
+    Admin[Admin] --- UC1((Kelola barang))
+    Admin --- UC2((Kelola kategori))
+    Admin --- UC3((Kelola supplier))
+    Admin --- UC4((Lihat laporan dan riwayat))
+    Admin --- UC5((Catat barang masuk))
+    Admin --- UC6((Catat barang keluar))
+    Admin --- UC7((Monitoring stok))
+    Petugas[Petugas Gudang] --- UC5
+    Petugas --- UC6
+    Petugas --- UC7

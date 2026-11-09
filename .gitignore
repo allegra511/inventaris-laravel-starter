@@ -1,0 +1,21 @@
+# Laravel runtime / secrets
+/app/.env
+/app/.env.*.local
+/app/vendor/
+/app/node_modules/
+/app/public/build/
+/app/storage/*.key
+/app/storage/logs/*
+/app/storage/framework/cache/data/*
+/app/storage/framework/sessions/*
+/app/storage/framework/views/*
+!/app/storage/logs/.gitignore
+!/app/storage/framework/cache/data/.gitignore
+!/app/storage/framework/sessions/.gitignore
+!/app/storage/framework/views/.gitignore
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,53 @@
+erDiagram
+    USERS ||--o{ STOCK_INS : mencatat
+    USERS ||--o{ STOCK_OUTS : mencatat
+    CATEGORIES ||--o{ ITEMS : memiliki
+    ITEMS ||--o{ STOCK_INS : dicatat_pada
+    ITEMS ||--o{ STOCK_OUTS : dikeluarkan_pada
+    SUPPLIERS ||--o{ STOCK_INS : memasok
+    USERS {
+        bigint id PK
+        string name
+        string email
+        string role
+    }
+    CATEGORIES {
+        bigint id PK
+        string name
+        text description
+    }
+    SUPPLIERS {
+        bigint id PK
+        string name
+        string contact_person
+        string phone
+        string email
+        text address
+    }
+    ITEMS {
+        bigint id PK
+        string code
+        string name
+        bigint category_id FK
+        string location
+        string unit
+        int stock
+        int minimum_stock
+    }
+    STOCK_INS {
+        bigint id PK
+        bigint item_id FK
+        bigint supplier_id FK
+        bigint user_id FK
+        date date
+        int quantity
+        text note
+    }
+    STOCK_OUTS {
+        bigint id PK
+        bigint item_id FK
+        bigint user_id FK
+        date date
+        int quantity
+        text note
+    }
